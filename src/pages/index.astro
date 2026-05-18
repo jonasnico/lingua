@@ -1,0 +1,95 @@
+---
+import {
+	addDays,
+	formatDisplayDate,
+	getOsloDateKey,
+	getSnippetIndex,
+	isDateKey,
+} from '../data/languages';
+import { spanishSnippets } from '../data/snippets/spanish';
+import '../styles/global.css';
+
+const requestedDay = Astro.url.searchParams.get('day');
+const dateKey = isDateKey(requestedDay) ? requestedDay : getOsloDateKey();
+const snippet = spanishSnippets[getSnippetIndex(dateKey, spanishSnippets.length)];
+const previousDay = addDays(dateKey, -1);
+const nextDay = addDays(dateKey, 1);
+const hasInvalidRequestedDay = requestedDay !== null && !isDateKey(requestedDay);
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
+		<link rel="icon" href={`${import.meta.env.BASE_URL}favicon.ico`} />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta
+			name="description"
+			content="A daily Spanish phrase with pronunciation, translation, and cultural context."
+		/>
+		<title>Lingua — daily Spanish phrases</title>
+	</head>
+	<body>
+		<div class="page-shell">
+			<header class="site-header" aria-label="Site header">
+				<a class="brand" href={import.meta.env.BASE_URL} aria-label="Lingua home">
+					<span class="brand-mark">L</span>
+					<span>Lingua</span>
+				</a>
+				<div class="language-label" aria-label="Current language">Spanish · more languages soon</div>
+			</header>
+
+			<main>
+				<section class="hero" aria-labelledby="daily-phrase">
+					<article class="snippet-card" data-snippet-card data-mood={snippet.mood}>
+						<p class="eyebrow">
+							<span class="stamp">Spanish</span>
+							<span data-snippet-date>{formatDisplayDate(dateKey)}</span>
+						</p>
+						<h1 id="daily-phrase" class="phrase" data-snippet-phrase>{snippet.phrase}</h1>
+						<span class="pronunciation" data-snippet-pronunciation>
+							{snippet.pronunciation}
+						</span>
+						<p class="translation" data-snippet-translation>{snippet.translation}</p>
+
+						<div class="learning-notes" aria-label="Phrase notes">
+							<section class="learning-note">
+								<span class="label">Context</span>
+								<p data-snippet-cultural-note>{snippet.culturalNote}</p>
+							</section>
+
+							<section class="learning-note">
+								<span class="label">Example</span>
+								<p class="example">
+									<strong data-snippet-example-original>{snippet.example.original}</strong>
+									<span data-snippet-example-translation>{snippet.example.translation}</span>
+								</p>
+							</section>
+						</div>
+
+						<nav class="controls" aria-label="Snippet navigation">
+							<a class="control-button" href={`?day=${previousDay}`} data-snippet-previous>Previous</a>
+							<button class="control-button primary" type="button" data-snippet-today>Today</button>
+							<a class="control-button" href={`?day=${nextDay}`} data-snippet-next>Next</a>
+							<a class="permalink" href={`?day=${dateKey}`} data-snippet-permalink>Copy link</a>
+						</nav>
+						<p
+							class:list={['interaction-status', { 'is-visible': hasInvalidRequestedDay }]}
+							data-snippet-status
+							aria-live="polite"
+						>
+							{hasInvalidRequestedDay
+								? 'That day link was not a valid calendar date, so today’s field note is showing.'
+								: ''}
+						</p>
+					</article>
+				</section>
+			</main>
+		</div>
+
+		<script>
+			import '../scripts/dailySnippet';
+		</script>
+	</body>
+</html>
