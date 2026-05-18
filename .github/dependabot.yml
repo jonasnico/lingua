@@ -1,0 +1,35 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "Europe/Oslo"
+    cooldown:
+      default-days: 7
+    groups:
+      all-minor-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      security-patches:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      time: "08:00"
+      timezone: "Europe/Oslo"
+    cooldown:
+      default-days: 7
+    groups:
+      github:
+        patterns:
+          - "*"     
