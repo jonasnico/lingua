@@ -1,0 +1,31 @@
+Human Spanish pronunciation recordings
+======================================
+
+These recordings are served unchanged. The .oga originals are named .ogg locally;
+their contents have not been edited or converted. No AI-generated or browser
+speech synthesis is used.
+
+que-tal.ogg
+  Original: Es-que tal.oga (original title includes an accent on "que")
+  Contributor/uploader: Orgullomoore
+  Source: https://commons.wikimedia.org/wiki/File:Es-qu%C3%A9_tal.oga
+  License: Creative Commons Attribution-ShareAlike 3.0 Unported
+  License terms: https://creativecommons.org/licenses/by-sa/3.0/
+
+hasta-luego.ogg
+  Original: Es-hasta luego.oga
+  Author: Fibonacci
+  Source: https://commons.wikimedia.org/wiki/File:Es-hasta_luego.oga
+  License: Creative Commons Attribution-ShareAlike 2.5 Generic
+  License terms: https://creativecommons.org/licenses/by-sa/2.5/
+
+mucho-gusto.ogg
+  Original: Es-mucho gusto.oga
+  Contributor/uploader: Orgullomoore
+  Source: https://commons.wikimedia.org/wiki/File:Es-mucho_gusto.oga
+  License: Creative Commons Attribution-ShareAlike 3.0 Unported
+  License terms: https://creativecommons.org/licenses/by-sa/3.0/
+
+The above licenses apply to the audio files, not to the application source.
+Attribution, original source links, and license links are also provided next to
+each recording in the app's Explore section.

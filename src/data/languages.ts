@@ -30,8 +30,6 @@ export const languages: Language[] = [
   },
 ];
 
-const DAY_IN_MS = 86_400_000;
-
 export function getOsloDateKey(date = new Date()): string {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Europe/Oslo',
@@ -51,18 +49,6 @@ export function isDateKey(value: string | null): value is string {
 
   const date = new Date(`${value}T12:00:00.000Z`);
   return !Number.isNaN(date.valueOf()) && date.toISOString().slice(0, 10) === value;
-}
-
-export function addDays(dateKey: string, days: number): string {
-  const date = new Date(`${dateKey}T12:00:00.000Z`);
-  date.setUTCDate(date.getUTCDate() + days);
-  return date.toISOString().slice(0, 10);
-}
-
-export function getSnippetIndex(dateKey: string, count: number): number {
-  const timestamp = Date.parse(`${dateKey}T00:00:00.000Z`);
-  const daysSinceEpoch = Math.floor(timestamp / DAY_IN_MS);
-  return ((daysSinceEpoch % count) + count) % count;
 }
 
 export function formatDisplayDate(dateKey: string): string {

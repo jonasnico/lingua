@@ -1,93 +1,137 @@
 ---
-import {
-	addDays,
-	formatDisplayDate,
-	getOsloDateKey,
-	getSnippetIndex,
-	isDateKey,
-} from '../data/languages';
-import { spanishSnippets } from '../data/snippets/spanish';
+import Icon from '../components/Icon.astro';
+import { formatDisplayDate } from '../data/languages';
+import { getAdjacentPublishedDay, resolveDailySelection } from '../data/dailySelection';
 import '../styles/global.css';
 
-const requestedDay = Astro.url.searchParams.get('day');
-const dateKey = isDateKey(requestedDay) ? requestedDay : getOsloDateKey();
-const snippet = spanishSnippets[getSnippetIndex(dateKey, spanishSnippets.length)];
-const previousDay = addDays(dateKey, -1);
-const nextDay = addDays(dateKey, 1);
-const hasInvalidRequestedDay = requestedDay !== null && !isDateKey(requestedDay);
+const { dateKey, snippet, message } = resolveDailySelection(new URLSearchParams());
+const previousDay = getAdjacentPublishedDay(dateKey, -1);
+const nextDay = getAdjacentPublishedDay(dateKey, 1);
+const baseUrl = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
 ---
 
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
-		<link rel="icon" href={`${import.meta.env.BASE_URL}favicon.ico`} />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
+		<link rel="icon" type="image/svg+xml" href={`${baseUrl}favicon.svg`} />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#f6f7f9" />
 		<meta
 			name="description"
-			content="A daily Spanish phrase with pronunciation, translation, and cultural context."
+			content="A little Spanish, every day. Discover one phrase at a time."
 		/>
-		<title>Lingua — daily Spanish phrases</title>
+		<title>Lingua — a little Spanish, every day</title>
 	</head>
 	<body>
+		<a class="skip-link" href="#daily-phrase">Skip to phrase</a>
 		<div class="page-shell">
-			<header class="site-header" aria-label="Site header">
-				<a class="brand" href={import.meta.env.BASE_URL} aria-label="Lingua home">
-					<span class="brand-mark">L</span>
-					<span>Lingua</span>
-				</a>
-				<div class="language-label" aria-label="Current language">Spanish · more languages soon</div>
+			<header class="site-header">
+				<a class="brand" href={baseUrl} aria-label="Lingua home">Lingua</a>
+				<div class="header-actions">
+					<span class="language-label">Spanish</span>
+					<details class="options" data-options>
+						<summary class="icon-button" aria-label="More options" title="More options">
+							<Icon name="more" />
+						</summary>
+						<div class="options-panel">
+							<label class="practice-option">
+								<span>Practice mode</span>
+								<input type="checkbox" data-snippet-recall checked />
+							</label>
+							<a
+								class="menu-link"
+								href={`?day=${dateKey}&phrase=${snippet.id}`}
+								data-snippet-permalink
+							>Copy phrase link</a>
+						</div>
+					</details>
+				</div>
 			</header>
 
 			<main>
-				<section class="hero" aria-labelledby="daily-phrase">
-					<article class="snippet-card" data-snippet-card data-mood={snippet.mood}>
-						<p class="eyebrow">
-							<span class="stamp">Spanish</span>
-							<span data-snippet-date>{formatDisplayDate(dateKey)}</span>
-						</p>
-						<h1 id="daily-phrase" class="phrase" data-snippet-phrase>{snippet.phrase}</h1>
-						<span class="pronunciation" data-snippet-pronunciation>
-							{snippet.pronunciation}
-						</span>
-						<p class="translation" data-snippet-translation>{snippet.translation}</p>
+				<article class="lesson" aria-labelledby="daily-phrase">
+					<time class="lesson-date" datetime={dateKey} data-snippet-date>
+						{formatDisplayDate(dateKey)}
+					</time>
+					<h1 id="daily-phrase" class="phrase" lang="es" data-snippet-phrase>{snippet.phrase}</h1>
 
-						<div class="learning-notes" aria-label="Phrase notes">
-							<section class="learning-note">
-								<span class="label">Context</span>
-								<p data-snippet-cultural-note>{snippet.culturalNote}</p>
+					<div class="meaning-stage">
+						<button
+							class="meaning-toggle"
+							type="button"
+							aria-expanded="false"
+							aria-controls="phrase-translation phrase-context example-translation"
+							data-snippet-reveal
+							hidden
+						>
+							<span data-reveal-label>Show meaning</span>
+							<span id="phrase-translation" data-snippet-translation hidden>{snippet.translation}</span>
+						</button>
+						<noscript><p class="translation">{snippet.translation}</p></noscript>
+					</div>
+
+					<div class="audio-control" data-audio-control hidden>
+						<button
+							class="text-button listen-button"
+							type="button"
+							aria-pressed="false"
+							data-snippet-listen
+						>
+							<Icon name="sound" />
+							<span data-listen-label>Listen</span>
+						</button>
+					</div>
+
+					<details class="explore" data-explore>
+						<summary class="text-button">
+							<span>Explore</span>
+							<Icon name="expand" />
+						</summary>
+						<div class="explore-content">
+							<section class="note">
+								<h2>Pronunciation</h2>
+								<p data-snippet-pronunciation>{snippet.pronunciation}</p>
+								<p class="region" data-snippet-region hidden={!snippet.region}>{snippet.region}</p>
 							</section>
-
-							<section class="learning-note">
-								<span class="label">Example</span>
-								<p class="example">
-									<strong data-snippet-example-original>{snippet.example.original}</strong>
-									<span data-snippet-example-translation>{snippet.example.translation}</span>
+							<section class="note">
+								<h2>In a sentence</h2>
+								<p lang="es" data-snippet-example-original>{snippet.example.original}</p>
+								<p class="example-translation" id="example-translation" data-snippet-example-translation>
+									{snippet.example.translation}
 								</p>
 							</section>
+							<section class="note" id="phrase-context" data-snippet-context>
+								<h2>A little context</h2>
+								<p data-snippet-cultural-note>{snippet.culturalNote}</p>
+							</section>
+							<p class="recording-credit" data-audio-help></p>
 						</div>
+					</details>
 
-						<nav class="controls" aria-label="Snippet navigation">
-							<a class="control-button" href={`?day=${previousDay}`} data-snippet-previous>Previous</a>
-							<button class="control-button primary" type="button" data-snippet-today>Today</button>
-							<a class="control-button" href={`?day=${nextDay}`} data-snippet-next>Next</a>
-							<a class="permalink" href={`?day=${dateKey}`} data-snippet-permalink>Copy link</a>
-						</nav>
-						<p
-							class:list={['interaction-status', { 'is-visible': hasInvalidRequestedDay }]}
-							data-snippet-status
-							aria-live="polite"
-						>
-							{hasInvalidRequestedDay
-								? 'That day link was not a valid calendar date, so today’s field note is showing.'
-								: ''}
-						</p>
-					</article>
-				</section>
+					<p class="interaction-status" data-snippet-status aria-live="polite" aria-atomic="true">{message}</p>
+					<p class="sr-only" data-snippet-announcement aria-live="polite" aria-atomic="true"></p>
+					<noscript><p class="interaction-status">Enable JavaScript to browse and practice.</p></noscript>
+				</article>
 			</main>
-		</div>
 
+			<footer>
+				<nav class="day-navigation" aria-label="Phrase navigation">
+					<a
+						class="text-button"
+						href={previousDay ? `?day=${previousDay}` : undefined}
+						aria-disabled={previousDay ? undefined : 'true'}
+						data-snippet-previous
+					><Icon name="previous" /><span>Previous</span></a>
+					<button class="text-button today-button" type="button" data-snippet-today>Today</button>
+					<a
+						class="text-button"
+						href={nextDay ? `?day=${nextDay}` : undefined}
+						aria-disabled={nextDay ? undefined : 'true'}
+						data-snippet-next
+					><span>Next</span><Icon name="next" /></a>
+				</nav>
+			</footer>
+		</div>
 		<script>
 			import '../scripts/dailySnippet';
 		</script>
